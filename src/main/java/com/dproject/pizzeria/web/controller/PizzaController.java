@@ -2,6 +2,7 @@ package com.dproject.pizzeria.web.controller;
 
 import com.dproject.pizzeria.persistence.entity.PizzaEntity;
 import com.dproject.pizzeria.services.PizzaService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,8 @@ public class PizzaController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<PizzaEntity>> getAll(){
-        return ResponseEntity.ok(pizzaService.getAll());
+    public ResponseEntity<Page<PizzaEntity>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "8") int elements){
+        return ResponseEntity.ok(pizzaService.getAll(page, elements));
     }
 
     @GetMapping("/{idPizza}")
@@ -27,8 +28,12 @@ public class PizzaController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<PizzaEntity>> getAvailable(){
-        return ResponseEntity.ok(pizzaService.getAvailable());
+    public ResponseEntity<Page<PizzaEntity>> getAvailable(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int elements,
+            @RequestParam(defaultValue = "pricePizza") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection){
+        return ResponseEntity.ok(pizzaService.getAvailable(page, elements, sortBy, sortDirection));
     }
 
     @GetMapping("/name/{name}")

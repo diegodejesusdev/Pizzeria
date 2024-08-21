@@ -1,10 +1,13 @@
 package com.dproject.pizzeria.services;
 
 import com.dproject.pizzeria.persistence.entity.PizzaEntity;
+import com.dproject.pizzeria.persistence.repository.PizzaPagSortRepository;
 import com.dproject.pizzeria.persistence.repository.PizzaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,15 +15,17 @@ import java.util.List;
 @Service
 public class PizzaService {
     private final PizzaRepository pizzaRepository;
+    private final PizzaPagSortRepository pizzaSortRepository;
 
     @Autowired
-    public PizzaService(PizzaRepository pizzaRepository) {
+    public PizzaService(PizzaRepository pizzaRepository, PizzaPagSortRepository pizzaSortRepository) {
         this.pizzaRepository = pizzaRepository;
+        this.pizzaSortRepository = pizzaSortRepository;
     }
 
-    public List<PizzaEntity> getAll(){
-        System.out.println(this.pizzaRepository.countAllByVeganPizzaTrue());
-        return this.pizzaRepository.findAll();
+    public Page<PizzaEntity> getAll(int page, int elements){
+        Pageable pageRequest = PageRequest.of(page, elements);
+        return this.pizzaSortRepository.findAll(pageRequest);
     }
 
     public PizzaEntity getById(int idPizza){
@@ -39,8 +44,10 @@ public class PizzaService {
         this.pizzaRepository.deleteById(idPizza);
     }
 
-    public List<PizzaEntity> getAvailable(){
-        return this.pizzaRepository.findAllByAvailablePizzaTrueOrderByPricePizza();
+    public Page<PizzaEntity> getAvailable(int page, int elements, String shortBy, String shortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(shortDirection), shortBy);
+        Pageable pageable = PageRequest.of(page, elements, sort);
+        return this.pizzaSortRepository.findByAvailablePizzaTrue(pageable);
     }
 
     public PizzaEntity getByName(String name){
