@@ -2,6 +2,7 @@ package com.dproject.pizzeria.web.controller;
 
 import com.dproject.pizzeria.persistence.entity.PizzaEntity;
 import com.dproject.pizzeria.services.PizzaService;
+import com.dproject.pizzeria.services.dto.UpdatePizzaPriceDto;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +69,15 @@ public class PizzaController {
     public ResponseEntity<PizzaEntity> update(@RequestBody PizzaEntity Pizza){
         if (Pizza.getIdPizza() != null && this.pizzaService.ifExits(Pizza.getIdPizza())){
             return ResponseEntity.ok(pizzaService.save(Pizza));
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping("/update_price/")
+    public ResponseEntity<Void> updatePrice(@RequestBody UpdatePizzaPriceDto dto){
+        if (this.pizzaService.ifExits(dto.getIdPizza())){
+            this.pizzaService.updatePrice(dto);
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
